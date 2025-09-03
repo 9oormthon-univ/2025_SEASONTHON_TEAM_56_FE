@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <body className={inter.className}>
-        <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
+        <div className="flex flex-col min-h-screen bg-gray-50">
           {/* Header: 모든 페이지에 공통으로 적용됩니다. */}
           <header className="bg-[#D0E3FE] border-b shadow-sm sticky top-0 z-10">
             <div className="container mx-auto px-10 py-3 flex items-center justify-between">
@@ -41,7 +41,7 @@ export default function RootLayout({ children }) {
           </header>
 
           {/* children: 이 부분에 각 페이지의 실제 내용이 들어옵니다. */}
-          <main className="flex-grow">{children}</main>
+          <main className="flex-grow overflow-y-auto">{children}</main>
 
           {/* 여기에 Footer를 추가할 수도 있습니다. */}
         </div>
