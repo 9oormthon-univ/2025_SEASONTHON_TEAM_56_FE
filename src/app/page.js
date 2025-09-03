@@ -89,7 +89,7 @@ export default function HomePage() {
             </div>
             <Button
               variant="outline"
-              className="text-blue-600 border-blue-600 hover:bg-blue-50 px- h-12"
+              className="text-blue-600 border-blue-600 hover:bg-blue-50 hover:text-blue-600 px- h-12"
               onClick={handleAddKeyword}
             >
               + 추가
