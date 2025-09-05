@@ -4,8 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState(""); // 사용자 입력 문장 저장
+
   // 추가된 키워드
   const [keywords, setKeywords] = useState([]);
   // 현재 입력중인 키워드
@@ -33,6 +37,15 @@ export default function HomePage() {
     }
   };
 
+  // 검색 버튼 클릭 시
+  const handleSearch = () => {
+    if (searchQuery.trim() !== "") {
+      router.push(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      alert("검색어를 입력해주세요.");
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <main className="flex-grow flex flex-col items-center justify-center p-8 mb-40">
@@ -47,6 +60,14 @@ export default function HomePage() {
           <div className="flex w-full space-x-2">
             <div className="relative flex-grow w-full">
               <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSearch();
+                  }
+                }}
                 type="text"
                 placeholder="원하는 상품을 자연스럽게 설명해보세요(예: 설날에 부모님께 드릴 달콤한 과일을 찾아줘)"
                 className="pl-10 pr-4 py-2 text-base h-12 focus-visible:ring-2 
@@ -68,7 +89,10 @@ export default function HomePage() {
                 ></path>
               </svg>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 h-12">
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 h-12"
+              onClick={handleSearch}
+            >
               검색
             </Button>
           </div>
