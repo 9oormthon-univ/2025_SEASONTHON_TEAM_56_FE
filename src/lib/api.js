@@ -1,0 +1,64 @@
+// 백엔드 서버 기본 주소
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://43.201.10.255:8080/api";
+
+/**
+ * AI 상세 설명을 요청하는 API 함수
+ * @param {Object} productData - 상품 정보 객체
+ * @param {string} [productData.name] - 상품명
+ * @param {string} [productData.simple_description] - 간단 설명
+ * @param {string[]} [productData.keywords] - 키워드 배열
+ * @param {string} [productData.category] - 카테고리
+ * @param {number} [productData.price] - 가격
+ * @returns {Promise<Object>} - AI가 생성한 상세 설명 데이터
+ */
+export const makeAiProductionDes = async (productData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/analyze`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "네트워크 응답에 문제가 있습니다.");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("AI 상세설명 요청 API 호출 중 오류 발생: ", error);
+    throw error;
+  }
+};
+
+/**
+ * 새로운 상품을 등록하는 API 함수
+ * @param {Object} productData - 등록할 상품 데이터
+ * @returns {Promise<Object>} - 등록 성공 시 { success: true, data: { product_id: ... } }
+ */
+export const registerProduct = async (productData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "상품 등록에 실패했습니다.");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("상품 등록 API 호출 중 오류 발생: ", error);
+    throw error;
+  }
+};
