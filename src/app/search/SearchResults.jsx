@@ -104,8 +104,7 @@ export default function SearchResultsPage() {
       <div className="w-full max-w-6xl bg-white p-8 rounded-lg shadow-md">
         {/* 검색 문장 표시 */}
         <h1 className="text-xl md:text-xl font-bold text-gray-800 mb-6">
-          <span className="text-blue-600">'{searchQuery}'</span>에 대한 검색
-          결과
+          <span className="text-black">'{searchQuery}'</span>에 대한 검색 결과
         </h1>
 
         {/* 연관 키워드 */}
@@ -190,7 +189,7 @@ export default function SearchResultsPage() {
                   </p>
                 </CardContent>
                 <CardFooter className="px-4 py-3 flex justify-between items-center border-t text-sm">
-                  <span className="text-lg font-bold text-blue-600">
+                  <span className="text-lg font-bold text-[#33A1E0]">
                     {product.price.toLocaleString()}원
                   </span>
                 </CardFooter>
