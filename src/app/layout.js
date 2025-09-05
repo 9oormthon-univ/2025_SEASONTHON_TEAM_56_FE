@@ -30,10 +30,10 @@ export default function RootLayout({ children }) {
                 <Link href="/" className="hover:text-blue-600">
                   상품 검색
                 </Link>
-                <Link href="/cart" className="hover:text-blue-600">
+                <Link href="/" className="hover:text-blue-600">
                   장바구니
                 </Link>
-                <Link href="/mypage" className="hover:text-blue-600">
+                <Link href="/" className="hover:text-blue-600">
                   마이페이지
                 </Link>
               </nav>
