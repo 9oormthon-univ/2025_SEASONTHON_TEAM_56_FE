@@ -51,7 +51,7 @@ export default function HomePage() {
       params.append("keywords", keywords.join(","));
     }
 
-    router.push(`/search${params.toString()}`);
+    router.push(`/search?${params.toString()}`);
   };
 
   return (
