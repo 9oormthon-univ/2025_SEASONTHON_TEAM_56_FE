@@ -62,3 +62,40 @@ export const registerProduct = async (productData) => {
     throw error;
   }
 };
+
+/**
+ * 문장형 쿼리와 키워드로 상품을 검색하는 API 함수
+ * @param {Object} params - 검색 파라미터
+ * @param {string} params.query - 사용자가 입력한 검색 문장
+ * @param {string[]} [params.keywords] - 사용자가 추가한 키워드 배열 (옵션)
+ * @returns {Promise<Object>} - 검색 결과 데이터
+ */
+
+export const searchProducts = async ({ query, keywords }) => {
+  try {
+    const params = new URLSearchParams();
+
+    params.append("query", query);
+
+    // 키워드가 존재하면 콤마로 구분된 문자열 만들어서 추가
+    if (keywords && keywords.length > 0) {
+      params.append("keywords", keywords.join(""));
+    }
+
+    // 쿼리 스트링으로 fetch 요청 보냄
+    const response = await fetch(
+      `${API_BASE_URL}/products/search?${params.toString()}`
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "네트워크 응답에 문제가 있습니다.");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("상품 검색 API 호출 중 오류 발생", error);
+    throw Error;
+  }
+};

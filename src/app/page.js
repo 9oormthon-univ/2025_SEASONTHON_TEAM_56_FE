@@ -39,11 +39,19 @@ export default function HomePage() {
 
   // 검색 버튼 클릭 시
   const handleSearch = () => {
-    if (searchQuery.trim() !== "") {
-      router.push(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
+    if (searchQuery.trim() == "") {
       alert("검색어를 입력해주세요.");
+      return;
     }
+
+    const params = new URLSearchParams();
+    params.append("query", searchQuery.trim());
+
+    if (keywords.length > 0) {
+      params.append("keywords", keywords.join(","));
+    }
+
+    router.push(`/search${params.toString()}`);
   };
 
   return (
