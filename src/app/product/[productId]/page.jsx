@@ -21,7 +21,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Label } from "@radix-ui/react-label";
+import { Label } from "@/components/ui/label";
+import { getProductById } from "@/lib/api";
+import LoadingAnimation from "@/components/LoadingAnimation";
 // 캐러셀 컴포넌트 (선택사항, 이미지 슬라이드를 구현하려면 설치 필요)
 // import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
@@ -34,52 +36,88 @@ export default function ProductDetailPage() {
   const [selectedOption, setSelectedOption] = useState(""); // 선택된 상품 옵션 (예: 2kg)
   const [quantity, setQuantity] = useState(1); // 선택된 수량
   const [totalPrice, setTotalPrice] = useState(0); // 총 결제 금액
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // 실제 데이터 대신 더미 데이터를 로드하는 효과
+  //사진
+  const [mainImage, setMainImage] = useState(null);
+
+  // 데이터 로딩을 위한 useEffect
   useEffect(() => {
-    // 실제라면 여기서 productId를 이용해 API를 호출하여 데이터를 가져옵니다.
-    // fetch(`/api/products/${productId}`).then(res => res.json()).then(data => setProduct(data));
+    if (!productId) return; // productId가 없으면 실행하지 않음
 
-    // 더미 데이터
-    const dummyProductData = {
-      id: productId,
-      name: "제주 한라봉",
-      tag: "농산물",
-      shortDescription: "제주도에서 직접 재배한 달콤한 한라봉입니다",
-      keywords: ["#제주도", "#과일선물", "#명절선물", "#비타민C", "#고당도"],
-      options: [
-        { id: "opt1", name: "제주 한라봉: 2kg", price: 25000 },
-        { id: "opt2", name: "제주 한라봉: 3kg", price: 35000 },
-        { id: "opt3", name: "제주 한라봉: 5kg", price: 50000 },
-      ],
-      detailDescription:
-        "제주도의 청정 자연에서 자란 프리미엄 한라봉을 만나보세요. 겨울철 제주도의 따뜻한 햇살과 깨끗한 공기를 머금고 자란 한라봉은 달콤함과 상큼함이 완벽하게 조화를 이룹니다. 비타민 C가 풍부하여 겨울철 감기 관리에도 탁월하며, 껍질이 얇고 과육이 부드러워 남녀노소 누구나 즐길 수 있습니다. 농약을 최소화하고 친환경적으로 재배하여 안심하고 드실 수 있는 건강한 과일입니다.",
-      sellerInfo: "로컬리 농장 (제주특별자치도 제주시)",
-      deliveryInfo: "평일 14시 이전 주문 시 당일 발송 (CJ 대한통운)",
-      images: [
-        "https://via.placeholder.com/600x400?text=Product+Image+1",
-        "https://via.placeholder.com/100x100?text=Thumb+1",
-        "https://via.placeholder.com/100x100?text=Thumb+2",
-        "https://via.placeholder.com/100x100?text=Thumb+3",
-      ],
+    const fetchProductDetail = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const result = await getProductById(productId);
+
+        if (result && result.data) {
+          setProduct(result.data);
+
+          if (result.data.images && result.data.images.length > 0) {
+            // is_main이 true인 이미지를 찾습니다.
+            const mainImgObject = result.data.images.find(
+              (img) => img.is_main === true
+            );
+            // 만약 mainImgObject가 있으면 그 URL을, 없으면 0번 이미지 URL을 대표로 설정합니다.
+            setMainImage(
+              mainImgObject ? mainImgObject.url : result.data.images[0].url
+            );
+          }
+
+          // 옵션이 없는 상품의 기본 가격 설정
+          if (!result.data.options || result.data.options.length === 0) {
+            setTotalPrice(result.data.price || 0);
+          }
+          // 옵션이 있다면 첫 번째 옵션을 기본으로 선택
+          if (result.data.options && result.data.options.length > 0) {
+            setSelectedOption(result.data.options[0].id);
+          }
+        } else {
+          throw new Error(
+            result.error?.message || "상품 상세 정보를 가져오지 못했습니다."
+          );
+        }
+      } catch (err) {
+        setError("상품 정보를 가져오는데 실패했습니다.");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    setProduct(dummyProductData);
-    // 초기 옵션 설정 및 총 가격 계산
-    if (dummyProductData.options.length > 0) {
-      setSelectedOption(dummyProductData.options[0].id);
-      setTotalPrice(dummyProductData.options[0].price * quantity);
-    }
-  }, [productId, quantity]); // productId나 quantity가 변하면 다시 계산
+    fetchProductDetail();
+  }, [productId]);
 
   // 옵션 변경 시 총 가격 계산
   useEffect(() => {
-    if (product && selectedOption) {
+    if (product && product.options && selectedOption) {
       const option = product.options.find((opt) => opt.id === selectedOption);
       if (option) {
         setTotalPrice(option.price * quantity);
       }
     }
   }, [selectedOption, quantity, product]);
+
+  // 로딩 및 에러 상태에 따른 UI 처리
+  if (isLoading) {
+    return (
+      // 2. 로딩 컴포넌트가 중앙에 오도록 스타일링
+      <div className="flex justify-center items-center h-[calc(100vh-64px)]">
+        <LoadingAnimation />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-center p-20 text-red-500">{error}</div>;
+  }
+
+  // 상품 데이터가 없을 경우 (예: 잘못된 ID)
+  if (!product) {
+    return <div className="text-center p-20">존재하지 않는 상품입니다.</div>;
+  }
 
   if (!product) {
     return (
@@ -92,7 +130,7 @@ export default function ProductDetailPage() {
   }
 
   // 선택된 옵션의 가격을 찾습니다.
-  const currentOption = product.options.find(
+  const currentOption = product?.options?.find(
     (opt) => opt.id === selectedOption
   );
   const currentPricePerUnit = currentOption ? currentOption.price : 0;
@@ -126,16 +164,16 @@ export default function ProductDetailPage() {
             {" "}
             {/* flex-1 추가, min-w-0으로 오버플로우 방지 */}
             {/* 메인 이미지 */}
-            <div className="bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center aspect-video mb-10">
+            <div className="bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center h-90 mb-10">
               <img
-                src={product.images[0]}
+                src={mainImage || "https://placehold.co/600x400?text=No+Image"}
                 alt={product.name}
                 className="w-full h-full object-contain"
               />
             </div>
             {/* 썸네일 이미지 */}
-            <div className="flex gap-2 justify-center">
-              {product.images.slice(1, 4).map((img, index) => (
+            {/* <div className="flex gap-2 justify-center">
+              {(product.images || []).map((imgObj, index) => (
                 <div
                   key={index}
                   className="w-20 h-20 bg-gray-100 rounded-md overflow-hidden border border-gray-200"
@@ -147,7 +185,7 @@ export default function ProductDetailPage() {
                   />
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
           {/* 오른쪽: 상품 정보 및 구매 옵션 */}
           <div className="flex-1 min-w-0 space-y-4">
@@ -159,13 +197,13 @@ export default function ProductDetailPage() {
             >
               {" "}
               {/* w-fit 추가 */}
-              {product.tag}
+              {product.category}
             </Badge>
             <h1 className="text-3xl font-bold text-gray-800">{product.name}</h1>
             <p className="text-sm text-gray-800">{product.shortDescription}</p>
             {/* 키워드 태그 */}
             <div className="flex flex-wrap gap-2">
-              {product.keywords.map((keyword, index) => (
+              {(product.keywords || []).map((keyword, index) => (
                 <Badge
                   key={index}
                   variant="outline"
@@ -188,7 +226,7 @@ export default function ProductDetailPage() {
                   <SelectValue placeholder="옵션을 선택해주세요" />
                 </SelectTrigger>
                 <SelectContent>
-                  {product.options.map((option) => (
+                  {(product.options || []).map((option) => (
                     <SelectItem key={option.id} value={option.id}>
                       {option.name}
                     </SelectItem>
@@ -253,7 +291,7 @@ export default function ProductDetailPage() {
           </h2>
           <div
             className="prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: product.detailDescription }}
+            dangerouslySetInnerHTML={{ __html: product.detailed_description }}
           >
             {/* 상세 설명은 HTML 태그를 포함할 수 있으므로 dangerouslySetInnerHTML을 사용 (보안 주의) */}
           </div>

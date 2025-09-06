@@ -14,9 +14,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label"; // Label 컴포넌트가 필요할 수 있습니다. (설치되어 있지 않다면 npx shadcn-ui@latest add label)
+import { makeAiProductionDes, registerProduct } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import SuccessAnimation from "@/components/SuccessAnimation";
 
 export default function ProductRegisterPage() {
-  const [productName, setProductName] = useState("");
+  const router = useRouter();
+
+  const [name, setName] = useState("");
   const [shortDescription, setShortDescription] = useState("");
   const [keywords, setKeywords] = useState([]); // 추가된 키워드 목록
   const [currentKeyword, setCurrentKeyword] = useState(""); // 현재 입력 중인 키워드
@@ -24,10 +29,21 @@ export default function ProductRegisterPage() {
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [images, setImages] = useState([]); // 이미지 파일 목록
+  const [analyzeId, setAnalyzeId] = useState(null);
+  const [mainImageUrl, setMainImageUrl] = useState(null);
+
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // 👇 --- 페이지 이동을 위해 등록된 상품 ID를 저장할 state 추가 --- 👇
+  const [registeredProductId, setRegisteredProductId] = useState(null);
 
   // 이미지 드래그 앤 드롭
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null); // 파일 인풋 참조
+
+  // 로딩 상태
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 키워드 추가 함수
   const handleAddKeyword = () => {
@@ -128,32 +144,130 @@ export default function ProductRegisterPage() {
   };
 
   // AI 추천 상세 설명 생성 함수 (더미)
-  const handleGenerateAISummary = () => {
-    alert("AI 추천 상세 설명 생성 (실제 구현 필요)");
+  const handleGenerateAISummary = async () => {
+    console.log("ai 설명 생성");
+    // alert("AI 추천 상세 설명 생성 (실제 구현 필요)");
     // 실제 백엔드 API 호출 로직이 여기에 들어갑니다.
-    setDetailDescription(
-      "이것은 AI가 생성한 멋진 상품 상세 설명입니다. 상품명과 간단 설명을 기반으로 생성되었습니다!"
-    );
+    // 필수 정보 입력되었는지 확인
+    if (!name && !shortDescription && image.length === 0) {
+      alert(
+        "AI가 설명을 생성하려면 상품명, 간단한 설명 중 하나를 입력해주세요."
+      );
+      return;
+    }
+
+    setIsAiLoading(true);
+
+    try {
+      // API에 보낼 데이터를 현재 state에서 수집
+      const productDataForAI = {
+        name,
+        simple_description: shortDescription,
+        keywords,
+        category,
+        price: Number(price) || undefined,
+      };
+
+      // API에 보낼 이미지 파일들만 추출
+      const imageFiles = images.map((img) => img.file);
+
+      // api 함수 호출
+      const result = await makeAiProductionDes(productDataForAI, imageFiles);
+
+      // 👇 이 부분을 추가하여 result.data의 내용을 직접 확인합니다.
+      console.log("AI 분석 API 응답 데이터:", result.data);
+
+      // API 응답 결과에서 상세 설명을 가져와 state 업데이트
+      if (result && result.data && result.data.detailed_description) {
+        setDetailDescription(result.data.detailed_description);
+        setAnalyzeId(result.data.analyze_id);
+
+        // 👇 result.data.main_image_url이 실제로 어떤 값인지 확인
+        console.log("main_image_url from API:", result.data.main_image_url);
+        setMainImageUrl(result.data.main_image_url || null);
+
+        // const analyzeId = result.data.analyze_id;
+        // console.log("AI 설명 ID: ", analyzeId);
+      } else {
+        // API 응답은 성공했지만, success가 false 이거나 데이터 형식이 다른 경우
+        throw new Error(result.message || "AI가 설명을 생성하지 못했습니다.");
+      }
+    } catch (error) {
+      alert(`상세 설명 생성에 실패했습니다: ${error.message}`);
+    } finally {
+      setIsAiLoading(false);
+    }
   };
 
   // 상품 등록 함수
-  const handleSubmitProduct = () => {
-    alert("상품 등록 (실제 API 호출 필요)");
-    // 여기서 모든 state 값들을 모아서 백엔드 API를 호출합니다.
-    const productData = {
-      productName,
-      shortDescription,
-      keywords,
-      detailDescription,
-      category,
-      price,
-      images: images.map((img) => img.file), // 실제 파일 객체들
-    };
-    console.log("등록할 상품 데이터:", productData);
+  const handleSubmitProduct = async () => {
+    if (!name || !category || !price) {
+      alert("상품명, 카테고리, 가격은 필수 입력 항목입니다.");
+      return;
+    }
+
+    // if (images.length > 0 && !mainImageUrl) {
+    //   alert(
+    //     "이미지를 첨부했다면, 먼저 'AI 설명 생성'을 실행하여 이미지 URL을 생성해야 합니다."
+    //   );
+    //   return;
+    // }
+
+    setIsSubmitting(true);
+
+    try {
+      // API에 보낼 상품 데이터 객체 생성
+      const productData = {
+        name,
+        simple_description: shortDescription,
+        keywords,
+        detailed_description: detailDescription,
+        category,
+        price: Number(price),
+        analyze_id: analyzeId,
+        // image_urls: mainImageUrl ? [mainImageUrl] : [],
+        // main_index: 0,
+      };
+      console.log("등록할 상품 데이터:", productData);
+
+      // api 함수 호출
+      const result = await registerProduct(productData);
+
+      if (result && result.data && result.data.product_id) {
+        // 👇 1. setTimeout을 제거하고, 등록된 상품 ID를 state에 저장합니다.
+        setRegisteredProductId(result.data.product_id);
+
+        // 👇 2. 성공 애니메이션을 보여주기만 합니다.
+        setShowSuccess(true);
+        // 등록 성공 후, 생성된 상품의 상세 페이지로 이동
+        // router.push(`/product/${newProductId}`);
+      } else {
+        throw new Error(result.message || "상품 등록에 실패했습니다.");
+      }
+    } catch (error) {
+      alert(`상품 등록 중 오류가 발생했습니다: ${error.message}`);
+    }
+  };
+
+  // 👇 --- 애니메이션 재생이 끝나면 호출될 함수를 만듭니다 --- 👇
+  const handleAnimationComplete = () => {
+    setShowSuccess(false); // 애니메이션 숨기기
+    if (registeredProductId) {
+      // 저장해둔 상품 ID로 상세 페이지로 이동
+      router.push(`/product/${registeredProductId}`);
+    }
   };
 
   return (
     <div className="flex justify-center p-8 bg-gray-50">
+      {/* 1. 성공 상태일 때 SuccessAnimation 컴포넌트를 렌더링합니다. */}
+      {showSuccess && (
+        <SuccessAnimation
+          message="상품이 성공적으로 등록되었습니다!"
+          onComplete={handleAnimationComplete}
+        />
+      )}
+
       <div className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">상품 등록</h2>
         <p className="text-gray-600 mb-8">
@@ -179,8 +293,8 @@ export default function ProductRegisterPage() {
                 id="productName"
                 placeholder="예: 제주 한라봉"
                 className="mt-1 mb-5"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
 
@@ -253,8 +367,9 @@ export default function ProductRegisterPage() {
                   variant="outline"
                   className="h-8 text-blue-600 border-blue-600 hover:bg-blue-50 hover:text-blue-600"
                   onClick={handleGenerateAISummary}
+                  disabled={isAiLoading}
                 >
-                  AI 설명 생성
+                  {isAiLoading ? "생성 중..." : "AI 설명 생성"}
                 </Button>
               </div>
               <div className="relative mt-1">
@@ -288,6 +403,11 @@ export default function ProductRegisterPage() {
                     <SelectItem value="수산물">수산물</SelectItem>
                     <SelectItem value="축산물">축산물</SelectItem>
                     <SelectItem value="가공식품">가공식품</SelectItem>
+                    <SelectItem value="패션/쥬얼리">패션/쥬얼리</SelectItem>
+                    <SelectItem value="케이스/문구">케이스/문구</SelectItem>
+                    <SelectItem value="뷰티">뷰티</SelectItem>
+                    <SelectItem value="반려동물">반려동물</SelectItem>
+                    <SelectItem value="공예">공예</SelectItem>
                     {/* ... 다른 카테고리 ... */}
                   </SelectContent>
                 </Select>
@@ -411,8 +531,9 @@ export default function ProductRegisterPage() {
         <Button
           onClick={handleSubmitProduct}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 mt-8"
+          disabled={isSubmitting}
         >
-          상품 등록하기
+          {isSubmitting ? "등록 중" : "상품 등록하기"}
         </Button>
       </div>
     </div>
