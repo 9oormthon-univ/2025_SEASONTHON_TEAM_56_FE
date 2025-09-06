@@ -402,12 +402,13 @@ export default function ProductRegisterPage() {
                     <SelectItem value="채소">채소</SelectItem>
                     <SelectItem value="수산물">수산물</SelectItem>
                     <SelectItem value="축산물">축산물</SelectItem>
-                    <SelectItem value="가공식품">가공식품</SelectItem>
+                    <SelectItem value="식품">식품</SelectItem>
                     <SelectItem value="패션/쥬얼리">패션/쥬얼리</SelectItem>
                     <SelectItem value="케이스/문구">케이스/문구</SelectItem>
                     <SelectItem value="뷰티">뷰티</SelectItem>
                     <SelectItem value="반려동물">반려동물</SelectItem>
                     <SelectItem value="공예">공예</SelectItem>
+                    <SelectItem value="홈리빙">홈리빙</SelectItem>
                     {/* ... 다른 카테고리 ... */}
                   </SelectContent>
                 </Select>
