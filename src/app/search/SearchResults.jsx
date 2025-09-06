@@ -100,9 +100,9 @@ export default function SearchResultsPage() {
 
         {/* 연관 키워드 */}
         <div className="mb-8">
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">
+          {/* <h2 className="text-sm font-semibold text-gray-700 mb-2">
             AI 추출 키워드
-          </h2>
+          </h2> */}
           <div className="flex flex-wrap gap-2">
             {relatedKeywords.map((keyword, index) => (
               <Badge
