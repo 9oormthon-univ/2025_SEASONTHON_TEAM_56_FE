@@ -37,11 +37,11 @@ export default function SearchResultsPage() {
         const keywordsArray = keywordsParam ? keywordsParam.split(",") : [];
 
         const result = await searchProducts({
-          searchQuery,
+          query: searchQuery,
           keywords: keywordsArray,
         });
 
-        if (result && result.success) {
+        if (result && result.data && Array.isArray(result.data.products)) {
           setRecommendedProducts(result.data.products);
           // 연관 키워드 백에서 주면 추가
         } else {
@@ -61,62 +61,6 @@ export default function SearchResultsPage() {
       setRecommendedProducts([]);
     }
   }, [searchQuery, keywordsParam]); // searchQuery나 keywordParam 바뀔때마다 재검색
-
-  // 더미 데이터 설정
-  //     setRelatedKeywords(["설날선물", "제주과일", "달콤한", "명절선물"]);
-  //     setRecommendedProducts([
-  //       {
-  //         id: "1",
-  //         name: "제주 한라봉",
-  //         description:
-  //           "제주도의 청정 자연에서 자란 프리미엄 한라봉을 만나보세요. 비타민 C가 풍부하여 겨울철 감기 관리에도...",
-  //         price: 25000,
-  //         tag: "제철과일",
-  //         imageUrl: "https://via.placeholder.com/200x200?text=Jeju+Hallabong",
-  //         isLiked: false, // 좋아요 상태 추가
-  //       },
-  //       {
-  //         id: "2",
-  //         name: "고당도 샤인머스켓",
-  //         description:
-  //           "알알이 꽉 찬 프리미엄 샤인머스켓! 망고향이 나는 달콤함이 일품입니다.",
-  //         price: 38000,
-  //         tag: "고급과일",
-  //         imageUrl: "https://via.placeholder.com/200x200?text=Shine+Muscat",
-  //         isLiked: false,
-  //       },
-  //       {
-  //         id: "3",
-  //         name: "상큼한 딸기 (1kg)",
-  //         description:
-  //           "새콤달콤한 맛이 일품인 싱싱한 딸기, 온 가족이 함께 즐기세요!",
-  //         price: 18000,
-  //         tag: "제철과일",
-  //         imageUrl: "https://via.placeholder.com/200x200?text=Strawberry",
-  //         isLiked: false,
-  //       },
-  //       // 더미 상품 추가
-  //       {
-  //         id: "4",
-  //         name: "프리미엄 사과 세트",
-  //         description:
-  //           "아삭한 식감과 풍부한 과즙의 프리미엄 사과, 선물용으로 좋습니다.",
-  //         price: 32000,
-  //         tag: "과일선물",
-  //         imageUrl: "https://via.placeholder.com/200x200?text=Apple+Set",
-  //         isLiked: false,
-  //       },
-  //       {
-  //         id: "5",
-  //         name: "싱싱한 감귤 (3kg)",
-  //         description: "새콤달콤한 맛과 비타민C가 가득한 싱싱한 감귤입니다.",
-  //         price: 15000,
-  //         tag: "제철과일",
-  //         imageUrl: "https://via.placeholder.com/200x200?text=Mandarin",
-  //         isLiked: false,
-  //       },
-  //     ]);
-  //   }, [searchQuery]); // searchQuery가 변경될 때마다 데이터를 다시 로드
 
   // 좋아요 버튼 토글 핸들러
   const handleLikeToggle = (productId) => {

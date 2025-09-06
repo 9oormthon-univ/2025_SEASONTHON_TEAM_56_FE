@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 export default function ProductRegisterPage() {
   const router = useRouter();
 
-  const [productName, setProductName] = useState("");
+  const [name, setName] = useState("");
   const [shortDescription, setShortDescription] = useState("");
   const [keywords, setKeywords] = useState([]); // 추가된 키워드 목록
   const [currentKeyword, setCurrentKeyword] = useState(""); // 현재 입력 중인 키워드
@@ -142,7 +142,7 @@ export default function ProductRegisterPage() {
     // alert("AI 추천 상세 설명 생성 (실제 구현 필요)");
     // 실제 백엔드 API 호출 로직이 여기에 들어갑니다.
     // 필수 정보 입력되었는지 확인
-    if (!productName && !shortDescription) {
+    if (!name && !shortDescription) {
       alert(
         "AI가 설명을 생성하려면 상품명, 간단한 설명 중 하나를 입력해주세요."
       );
@@ -154,7 +154,7 @@ export default function ProductRegisterPage() {
     try {
       // API에 보낼 데이터를 현재 state에서 수집
       const productDataForAI = {
-        name: productName,
+        name,
         simple_description: shortDescription,
         keywords,
         category,
@@ -165,12 +165,7 @@ export default function ProductRegisterPage() {
       const result = await makeAiProductionDes(productDataForAI);
 
       // API 응답 결과에서 상세 설명을 가져와 state 업데이트
-      if (
-        result &&
-        result.success &&
-        result.data &&
-        result.data.detailed_description
-      ) {
+      if (result && result.data && result.data.detailed_description) {
         setDetailDescription(result.data.detailed_description);
         setIsAnalyzeId(result.data.analyze_id);
 
@@ -189,7 +184,7 @@ export default function ProductRegisterPage() {
 
   // 상품 등록 함수
   const handleSubmitProduct = async () => {
-    if (!productName || !category || !price) {
+    if (!name || !category || !price) {
       alert("상품명, 카테고리, 가격은 필수 입력 항목입니다.");
       return;
     }
@@ -199,7 +194,7 @@ export default function ProductRegisterPage() {
     try {
       // API에 보낼 상품 데이터 객체 생성
       const productData = {
-        productName,
+        name,
         simple_description: shortDescription,
         keywords,
         detailed_description: detailDescription,
@@ -213,7 +208,7 @@ export default function ProductRegisterPage() {
       // api 함수 호출
       const result = await registerProduct(productData);
 
-      if (result && result.success) {
+      if (result && result.data && result.data.product_id) {
         alert("상품이 성공적으로 등록되었습니다.");
         const newProductId = result.data.product_id;
         // 등록 성공 후, 생성된 상품의 상세 페이지로 이동
@@ -255,8 +250,8 @@ export default function ProductRegisterPage() {
                 id="productName"
                 placeholder="예: 제주 한라봉"
                 className="mt-1 mb-5"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
 

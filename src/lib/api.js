@@ -1,6 +1,6 @@
 // 백엔드 서버 기본 주소
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://43.201.10.255:8080/api";
+  process.env.NEXT_PUBLIC_API_URL || "http://43.201.10.255:8080/api";
 
 /**
  * AI 상세 설명을 요청하는 API 함수
@@ -97,5 +97,33 @@ export const searchProducts = async ({ query, keywords }) => {
   } catch (error) {
     console.error("상품 검색 API 호출 중 오류 발생", error);
     throw Error;
+  }
+};
+
+/**
+ * 상품 ID로 상세 정보를 조회하는 API 함수
+ * @param {string} productId - 조회할 상품의 ID
+ * @returns {Promise<Object>} - 상품 상세 정보 데이터
+ */
+
+export const getProductById = async (productId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}`);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.error?.message || "상품 정보를 불러오는데 실패했습니다."
+      );
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(
+      `상품 상세 정보(ID: ${productId}) API 호출 중 오류 발생: `,
+      error
+    );
+    throw error;
   }
 };
