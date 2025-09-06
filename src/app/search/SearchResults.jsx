@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link"; // 상품 상세 페이지로 이동하기 위해
 import { searchProducts } from "@/lib/api";
+import LoadingAnimation from "@/components/LoadingAnimation";
 
 export default function SearchResultsPage() {
   const searchParams = useSearchParams();
@@ -76,7 +77,10 @@ export default function SearchResultsPage() {
   // 로딩 및 에러 상태에 따른 UI 처리
   if (isLoading) {
     return (
-      <div className="text-center p-20">AI가 맞춤 상품을 찾고 있어요...</div>
+      // 2. 로딩 컴포넌트가 중앙에 오도록 스타일링
+      <div className="flex justify-center items-center h-[calc(100vh-64px)]">
+        <LoadingAnimation />
+      </div>
     );
   }
 

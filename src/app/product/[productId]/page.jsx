@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/accordion";
 import { Label } from "@/components/ui/label";
 import { getProductById } from "@/lib/api";
+import LoadingAnimation from "@/components/LoadingAnimation";
 // 캐러셀 컴포넌트 (선택사항, 이미지 슬라이드를 구현하려면 설치 필요)
 // import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
@@ -88,7 +89,10 @@ export default function ProductDetailPage() {
   // 로딩 및 에러 상태에 따른 UI 처리
   if (isLoading) {
     return (
-      <div className="text-center p-20">상품 정보를 불러오는 중입니다...</div>
+      // 2. 로딩 컴포넌트가 중앙에 오도록 스타일링
+      <div className="flex justify-center items-center h-[calc(100vh-64px)]">
+        <LoadingAnimation />
+      </div>
     );
   }
 

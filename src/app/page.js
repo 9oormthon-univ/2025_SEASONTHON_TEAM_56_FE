@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import LoadingAnimation from "@/components/LoadingAnimation";
 
 export default function HomePage() {
   const router = useRouter();
