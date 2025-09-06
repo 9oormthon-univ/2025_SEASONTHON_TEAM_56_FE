@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingAnimation from "@/components/LoadingAnimation";
+import SuccessAnimation from "@/components/SuccessAnimation";
 
 export default function HomePage() {
   const router = useRouter();

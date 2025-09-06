@@ -16,6 +16,7 @@ import {
 import { Label } from "@/components/ui/label"; // Label 컴포넌트가 필요할 수 있습니다. (설치되어 있지 않다면 npx shadcn-ui@latest add label)
 import { makeAiProductionDes, registerProduct } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import SuccessAnimation from "@/components/SuccessAnimation";
 
 export default function ProductRegisterPage() {
   const router = useRouter();
@@ -30,6 +31,11 @@ export default function ProductRegisterPage() {
   const [images, setImages] = useState([]); // 이미지 파일 목록
   const [analyzeId, setAnalyzeId] = useState(null);
   const [mainImageUrl, setMainImageUrl] = useState(null);
+
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // 👇 --- 페이지 이동을 위해 등록된 상품 ID를 저장할 state 추가 --- 👇
+  const [registeredProductId, setRegisteredProductId] = useState(null);
 
   // 이미지 드래그 앤 드롭
   const [isDragging, setIsDragging] = useState(false);
@@ -228,22 +234,40 @@ export default function ProductRegisterPage() {
       const result = await registerProduct(productData);
 
       if (result && result.data && result.data.product_id) {
-        alert("상품이 성공적으로 등록되었습니다.");
-        const newProductId = result.data.product_id;
+        // 👇 1. setTimeout을 제거하고, 등록된 상품 ID를 state에 저장합니다.
+        setRegisteredProductId(result.data.product_id);
+
+        // 👇 2. 성공 애니메이션을 보여주기만 합니다.
+        setShowSuccess(true);
         // 등록 성공 후, 생성된 상품의 상세 페이지로 이동
-        router.push(`/product/${newProductId}`);
+        // router.push(`/product/${newProductId}`);
       } else {
         throw new Error(result.message || "상품 등록에 실패했습니다.");
       }
     } catch (error) {
       alert(`상품 등록 중 오류가 발생했습니다: ${error.message}`);
-    } finally {
-      setIsSubmitting(false);
+    }
+  };
+
+  // 👇 --- 애니메이션 재생이 끝나면 호출될 함수를 만듭니다 --- 👇
+  const handleAnimationComplete = () => {
+    setShowSuccess(false); // 애니메이션 숨기기
+    if (registeredProductId) {
+      // 저장해둔 상품 ID로 상세 페이지로 이동
+      router.push(`/product/${registeredProductId}`);
     }
   };
 
   return (
     <div className="flex justify-center p-8 bg-gray-50">
+      {/* 1. 성공 상태일 때 SuccessAnimation 컴포넌트를 렌더링합니다. */}
+      {showSuccess && (
+        <SuccessAnimation
+          message="상품이 성공적으로 등록되었습니다!"
+          onComplete={handleAnimationComplete}
+        />
+      )}
+
       <div className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">상품 등록</h2>
         <p className="text-gray-600 mb-8">
