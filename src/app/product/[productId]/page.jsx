@@ -39,6 +39,9 @@ export default function ProductDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  //사진
+  const [mainImage, setMainImage] = useState(null);
+
   // 데이터 로딩을 위한 useEffect
   useEffect(() => {
     if (!productId) return; // productId가 없으면 실행하지 않음
@@ -52,6 +55,17 @@ export default function ProductDetailPage() {
 
         if (result && result.data) {
           setProduct(result.data);
+
+          if (result.data.images && result.data.images.length > 0) {
+            // is_main이 true인 이미지를 찾습니다.
+            const mainImgObject = result.data.images.find(
+              (img) => img.is_main === true
+            );
+            // 만약 mainImgObject가 있으면 그 URL을, 없으면 0번 이미지 URL을 대표로 설정합니다.
+            setMainImage(
+              mainImgObject ? mainImgObject.url : result.data.images[0].url
+            );
+          }
 
           // 옵션이 없는 상품의 기본 가격 설정
           if (!result.data.options || result.data.options.length === 0) {
@@ -150,19 +164,16 @@ export default function ProductDetailPage() {
             {" "}
             {/* flex-1 추가, min-w-0으로 오버플로우 방지 */}
             {/* 메인 이미지 */}
-            <div className="bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center aspect-video mb-10">
+            <div className="bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center h-90 mb-10">
               <img
-                src={
-                  product.images?.[0] ||
-                  "https://via.placeholder.com/600x400?text=No+Image"
-                }
+                src={mainImage || "https://placehold.co/600x400?text=No+Image"}
                 alt={product.name}
                 className="w-full h-full object-contain"
               />
             </div>
             {/* 썸네일 이미지 */}
-            <div className="flex gap-2 justify-center">
-              {product.images?.slice(1, 4).map((img, index) => (
+            {/* <div className="flex gap-2 justify-center">
+              {(product.images || []).map((imgObj, index) => (
                 <div
                   key={index}
                   className="w-20 h-20 bg-gray-100 rounded-md overflow-hidden border border-gray-200"
@@ -174,7 +185,7 @@ export default function ProductDetailPage() {
                   />
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
           {/* 오른쪽: 상품 정보 및 구매 옵션 */}
           <div className="flex-1 min-w-0 space-y-4">
@@ -186,13 +197,13 @@ export default function ProductDetailPage() {
             >
               {" "}
               {/* w-fit 추가 */}
-              {product.tag}
+              {product.category}
             </Badge>
             <h1 className="text-3xl font-bold text-gray-800">{product.name}</h1>
             <p className="text-sm text-gray-800">{product.shortDescription}</p>
             {/* 키워드 태그 */}
             <div className="flex flex-wrap gap-2">
-              {product.keywords.map((keyword, index) => (
+              {(product.keywords || []).map((keyword, index) => (
                 <Badge
                   key={index}
                   variant="outline"
@@ -215,7 +226,7 @@ export default function ProductDetailPage() {
                   <SelectValue placeholder="옵션을 선택해주세요" />
                 </SelectTrigger>
                 <SelectContent>
-                  {product?.options?.map((option) => (
+                  {(product.options || []).map((option) => (
                     <SelectItem key={option.id} value={option.id}>
                       {option.name}
                     </SelectItem>

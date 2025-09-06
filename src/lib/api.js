@@ -12,14 +12,23 @@ const API_BASE_URL =
  * @param {number} [productData.price] - 가격
  * @returns {Promise<Object>} - AI가 생성한 상세 설명 데이터
  */
-export const makeAiProductionDes = async (productData) => {
+export const makeAiProductionDes = async (productData, imageFiles) => {
+  const formData = new FormData();
+
+  formData.append(
+    "payload",
+    new Blob([JSON.stringify(productData)], { type: "application/json" })
+  );
+
+  imageFiles.forEach((file) => {
+    formData.append("images", file);
+  });
+
   try {
     const response = await fetch(`${API_BASE_URL}/products/analyze`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(productData),
+
+      body: formData,
     });
 
     if (!response.ok) {
@@ -40,14 +49,31 @@ export const makeAiProductionDes = async (productData) => {
  * @param {Object} productData - 등록할 상품 데이터
  * @returns {Promise<Object>} - 등록 성공 시 { success: true, data: { product_id: ... } }
  */
-export const registerProduct = async (productData) => {
+export const registerProduct = async (productData, imageFiles) => {
+  // 1. 텍스트와 파일을 모두 담을 FormData 객체를 생성합니다.
+  const formData = new FormData();
+
+  // 2. 텍스트 데이터(productData)를 'productRequest' 같은 키에 JSON 문자열로 추가합니다.
+  //    (이 key 이름은 백엔드와 약속해야 합니다.)
+  formData.append(
+    "payload", // 또는 'payload', 'dto' 등 백엔드가 요구하는 이름
+    new Blob([JSON.stringify(productData)], { type: "application/json" })
+  );
+
+  // 3. 이미지 파일들을 'images' 키에 여러 개 추가합니다.
+  //    (이 key 이름도 백엔드와 약속해야 합니다.)
+  if (imageFiles && imageFiles.length > 0) {
+    imageFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+  }
+
   try {
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(productData),
+      // ❗ FormData를 보낼 때는 headers를 설정하지 않습니다.
+      //    브라우저가 알아서 'multipart/form-data'와 경계(boundary)를 설정해줍니다.
+      body: formData,
     });
 
     if (!response.ok) {

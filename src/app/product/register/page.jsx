@@ -28,7 +28,8 @@ export default function ProductRegisterPage() {
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [images, setImages] = useState([]); // 이미지 파일 목록
-  const [analyzeId, setIsAnalyzeId] = useState(null);
+  const [analyzeId, setAnalyzeId] = useState(null);
+  const [mainImageUrl, setMainImageUrl] = useState(null);
 
   // 이미지 드래그 앤 드롭
   const [isDragging, setIsDragging] = useState(false);
@@ -142,7 +143,7 @@ export default function ProductRegisterPage() {
     // alert("AI 추천 상세 설명 생성 (실제 구현 필요)");
     // 실제 백엔드 API 호출 로직이 여기에 들어갑니다.
     // 필수 정보 입력되었는지 확인
-    if (!name && !shortDescription) {
+    if (!name && !shortDescription && image.length === 0) {
       alert(
         "AI가 설명을 생성하려면 상품명, 간단한 설명 중 하나를 입력해주세요."
       );
@@ -161,13 +162,23 @@ export default function ProductRegisterPage() {
         price: Number(price) || undefined,
       };
 
+      // API에 보낼 이미지 파일들만 추출
+      const imageFiles = images.map((img) => img.file);
+
       // api 함수 호출
-      const result = await makeAiProductionDes(productDataForAI);
+      const result = await makeAiProductionDes(productDataForAI, imageFiles);
+
+      // 👇 이 부분을 추가하여 result.data의 내용을 직접 확인합니다.
+      console.log("AI 분석 API 응답 데이터:", result.data);
 
       // API 응답 결과에서 상세 설명을 가져와 state 업데이트
       if (result && result.data && result.data.detailed_description) {
         setDetailDescription(result.data.detailed_description);
-        setIsAnalyzeId(result.data.analyze_id);
+        setAnalyzeId(result.data.analyze_id);
+
+        // 👇 result.data.main_image_url이 실제로 어떤 값인지 확인
+        console.log("main_image_url from API:", result.data.main_image_url);
+        setMainImageUrl(result.data.main_image_url || null);
 
         // const analyzeId = result.data.analyze_id;
         // console.log("AI 설명 ID: ", analyzeId);
@@ -189,6 +200,13 @@ export default function ProductRegisterPage() {
       return;
     }
 
+    // if (images.length > 0 && !mainImageUrl) {
+    //   alert(
+    //     "이미지를 첨부했다면, 먼저 'AI 설명 생성'을 실행하여 이미지 URL을 생성해야 합니다."
+    //   );
+    //   return;
+    // }
+
     setIsSubmitting(true);
 
     try {
@@ -201,7 +219,8 @@ export default function ProductRegisterPage() {
         category,
         price: Number(price),
         analyze_id: analyzeId,
-        // images: images.map((img) => img.file), // 실제 파일 객체들
+        // image_urls: mainImageUrl ? [mainImageUrl] : [],
+        // main_index: 0,
       };
       console.log("등록할 상품 데이터:", productData);
 
@@ -360,6 +379,11 @@ export default function ProductRegisterPage() {
                     <SelectItem value="수산물">수산물</SelectItem>
                     <SelectItem value="축산물">축산물</SelectItem>
                     <SelectItem value="가공식품">가공식품</SelectItem>
+                    <SelectItem value="패션/쥬얼리">패션/쥬얼리</SelectItem>
+                    <SelectItem value="케이스/문구">케이스/문구</SelectItem>
+                    <SelectItem value="뷰티">뷰티</SelectItem>
+                    <SelectItem value="반려동물">반려동물</SelectItem>
+                    <SelectItem value="공예">공예</SelectItem>
                     {/* ... 다른 카테고리 ... */}
                   </SelectContent>
                 </Select>
