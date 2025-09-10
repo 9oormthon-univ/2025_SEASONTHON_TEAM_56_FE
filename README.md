@@ -52,6 +52,7 @@ Image Storage (AWS S3): 이미지와 같은 정적 파일은 S3 Presigned URL �
 ## 서비스 화면
 <img width="3944" height="2564" alt="Image" src="https://github.com/user-attachments/assets/63735845-16ab-4b18-962a-61ee5056651f" />
 <img width="3944" height="2564" alt="Image" src="https://github.com/user-attachments/assets/0e836f88-33f3-41d2-bee9-1532b9bce70a" />
+<img width="3944" height="2564" alt="Image" src="https://github.com/user-attachments/assets/0a6bd108-dd3c-4261-bdc9-69ee5c1f1d98" />
 
 <br/>
 
