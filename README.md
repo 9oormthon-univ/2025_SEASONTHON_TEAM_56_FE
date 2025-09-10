@@ -1,4 +1,4 @@
-## locally - AI 문장형 상품 추천 플랫폼
+## Locally - AI 문장형 상품 추천 플랫폼
 <div align="center">
 
 <br/>
@@ -52,35 +52,9 @@ Image Storage (AWS S3): 이미지와 같은 정적 파일은 S3 Presigned URL �
 ## 서비스 화면
 <img width="3944" height="2564" alt="Image" src="https://github.com/user-attachments/assets/63735845-16ab-4b18-962a-61ee5056651f" />
 <img width="3944" height="2564" alt="Image" src="https://github.com/user-attachments/assets/0e836f88-33f3-41d2-bee9-1532b9bce70a" />
+<img width="3944" height="2564" alt="Image" src="https://github.com/user-attachments/assets/02c49930-30d8-4d42-b714-6e7953b6a1a7" />
 <img width="3944" height="2564" alt="Image" src="https://github.com/user-attachments/assets/0a6bd108-dd3c-4261-bdc9-69ee5c1f1d98" />
 
-<br/>
 
-📖 시작하기 (Getting Started)
-로컬 환경에서 프로젝트 실행하기
-저장소 복제
 
-Bash
 
-git clone https://github.com/your-github-id/your-repo-name.git
-cd your-repo-name
-의존성 설치
-
-Bash
-
-npm install
-환경 변수 설정
-
-프로젝트 루트에 .env.local 파일을 생성합니다.
-
-파일 안에 백엔드 API 서버 주소를 입력합니다.
-
-NEXT_PUBLIC_API_URL=http://localhost:8080/api
-개발 서버 실행
-
-Bash
-
-npm run dev
-브라우저에서 http://localhost:3000으로 접속하여 확인합니다.
-
-<br/>
