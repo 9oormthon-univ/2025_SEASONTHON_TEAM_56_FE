@@ -17,7 +17,7 @@ export const makeAiProductionDes = async (productData, imageFiles) => {
 
   formData.append(
     "payload",
-    new Blob([JSON.stringify(productData)], { type: "application/json" })
+    new Blob([JSON.stringify(productData)], { type: "application/json" }),
   );
 
   imageFiles.forEach((file) => {
@@ -50,18 +50,16 @@ export const makeAiProductionDes = async (productData, imageFiles) => {
  * @returns {Promise<Object>} - 등록 성공 시 { success: true, data: { product_id: ... } }
  */
 export const registerProduct = async (productData, imageFiles) => {
-  // 1. 텍스트와 파일을 모두 담을 FormData 객체를 생성합니다.
+  // 텍스트와 파일을 모두 담을 FormData 객체를 생성
   const formData = new FormData();
 
-  // 2. 텍스트 데이터(productData)를 'productRequest' 같은 키에 JSON 문자열로 추가합니다.
-  //    (이 key 이름은 백엔드와 약속해야 합니다.)
+  // 텍스트 데이터(productData)를 'productRequest' 같은 키에 JSON 문자열로 추가
   formData.append(
     "payload", // 또는 'payload', 'dto' 등 백엔드가 요구하는 이름
-    new Blob([JSON.stringify(productData)], { type: "application/json" })
+    new Blob([JSON.stringify(productData)], { type: "application/json" }),
   );
 
-  // 3. 이미지 파일들을 'images' 키에 여러 개 추가합니다.
-  //    (이 key 이름도 백엔드와 약속해야 합니다.)
+  // 이미지 파일들을 'images' 키에 여러 개 추가
   if (imageFiles && imageFiles.length > 0) {
     imageFiles.forEach((file) => {
       formData.append("images", file);
@@ -71,8 +69,6 @@ export const registerProduct = async (productData, imageFiles) => {
   try {
     const response = await fetch(`${API_BASE_URL}/products`, {
       method: "POST",
-      // ❗ FormData를 보낼 때는 headers를 설정하지 않습니다.
-      //    브라우저가 알아서 'multipart/form-data'와 경계(boundary)를 설정해줍니다.
       body: formData,
     });
 
@@ -110,7 +106,7 @@ export const searchProducts = async ({ query, keywords }) => {
 
     // 쿼리 스트링으로 fetch 요청 보냄
     const response = await fetch(
-      `${API_BASE_URL}/products/search?${params.toString()}`
+      `${API_BASE_URL}/products/search?${params.toString()}`,
     );
 
     if (!response.ok) {
@@ -139,7 +135,7 @@ export const getProductById = async (productId) => {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.error?.message || "상품 정보를 불러오는데 실패했습니다."
+        errorData.error?.message || "상품 정보를 불러오는데 실패했습니다.",
       );
     }
 
@@ -148,7 +144,7 @@ export const getProductById = async (productId) => {
   } catch (error) {
     console.error(
       `상품 상세 정보(ID: ${productId}) API 호출 중 오류 발생: `,
-      error
+      error,
     );
     throw error;
   }

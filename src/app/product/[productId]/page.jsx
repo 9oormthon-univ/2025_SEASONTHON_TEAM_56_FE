@@ -1,5 +1,5 @@
 // app/product/[productId]/page.jsx
-"use client"; // 클라이언트 컴포넌트로 지정
+"use client";
 
 import { useState, useEffect } from "react";
 // Next.js 라우터 훅
@@ -24,14 +24,11 @@ import {
 import { Label } from "@/components/ui/label";
 import { getProductById } from "@/lib/api";
 import LoadingAnimation from "@/components/LoadingAnimation";
-// 캐러셀 컴포넌트 (선택사항, 이미지 슬라이드를 구현하려면 설치 필요)
-// import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export default function ProductDetailPage() {
-  const params = useParams(); // URL 파라미터 가져오기 (예: { productId: '123' })
+  const params = useParams(); // URL 파라미터 가져오기
   const productId = params.productId; // 현재 상품 ID
 
-  // 더미 상품 데이터 (실제로는 API 호출로 가져옵니다)
   const [product, setProduct] = useState(null);
   const [selectedOption, setSelectedOption] = useState(""); // 선택된 상품 옵션 (예: 2kg)
   const [quantity, setQuantity] = useState(1); // 선택된 수량
@@ -57,13 +54,13 @@ export default function ProductDetailPage() {
           setProduct(result.data);
 
           if (result.data.images && result.data.images.length > 0) {
-            // is_main이 true인 이미지를 찾습니다.
+            // is_main이 true인 이미지를 찾음
             const mainImgObject = result.data.images.find(
-              (img) => img.is_main === true
+              (img) => img.is_main === true,
             );
-            // 만약 mainImgObject가 있으면 그 URL을, 없으면 0번 이미지 URL을 대표로 설정합니다.
+            // 만약 mainImgObject가 있으면 그 URL을, 없으면 0번 이미지 URL을 대표로 설정.
             setMainImage(
-              mainImgObject ? mainImgObject.url : result.data.images[0].url
+              mainImgObject ? mainImgObject.url : result.data.images[0].url,
             );
           }
 
@@ -77,7 +74,7 @@ export default function ProductDetailPage() {
           }
         } else {
           throw new Error(
-            result.error?.message || "상품 상세 정보를 가져오지 못했습니다."
+            result.error?.message || "상품 상세 정보를 가져오지 못했습니다.",
           );
         }
       } catch (err) {
@@ -114,7 +111,7 @@ export default function ProductDetailPage() {
     return <div className="text-center p-20 text-red-500">{error}</div>;
   }
 
-  // 상품 데이터가 없을 경우 (예: 잘못된 ID)
+  // 상품 데이터가 없을 경우
   if (!product) {
     return <div className="text-center p-20">존재하지 않는 상품입니다.</div>;
   }
@@ -129,9 +126,9 @@ export default function ProductDetailPage() {
     );
   }
 
-  // 선택된 옵션의 가격을 찾습니다.
+  // 선택된 옵션의 가격을 찾음.
   const currentOption = product?.options?.find(
-    (opt) => opt.id === selectedOption
+    (opt) => opt.id === selectedOption,
   );
   const currentPricePerUnit = currentOption ? currentOption.price : 0;
 
@@ -150,7 +147,7 @@ export default function ProductDetailPage() {
     alert(
       `${product.name} (옵션: ${
         currentOption?.name
-      }, 수량: ${quantity}개) 총 ${totalPrice.toLocaleString()}원 구매`
+      }, 수량: ${quantity}개) 총 ${totalPrice.toLocaleString()}원 구매`,
     );
     // 실제 결제 또는 장바구니 추가 로직
   };
@@ -171,21 +168,6 @@ export default function ProductDetailPage() {
                 className="w-full h-full object-contain"
               />
             </div>
-            {/* 썸네일 이미지 */}
-            {/* <div className="flex gap-2 justify-center">
-              {(product.images || []).map((imgObj, index) => (
-                <div
-                  key={index}
-                  className="w-20 h-20 bg-gray-100 rounded-md overflow-hidden border border-gray-200"
-                >
-                  <img
-                    src={img}
-                    alt={`Thumbnail ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </div> */}
           </div>
           {/* 오른쪽: 상품 정보 및 구매 옵션 */}
           <div className="flex-1 min-w-0 space-y-4">
@@ -293,7 +275,7 @@ export default function ProductDetailPage() {
             className="prose max-w-none"
             dangerouslySetInnerHTML={{ __html: product.detailed_description }}
           >
-            {/* 상세 설명은 HTML 태그를 포함할 수 있으므로 dangerouslySetInnerHTML을 사용 (보안 주의) */}
+            {/* 상세 설명은 HTML 태그를 포함할 수 있으므로 dangerouslySetInnerHTML을 사용 */}
           </div>
         </div>
 

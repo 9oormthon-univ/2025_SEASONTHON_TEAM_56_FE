@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label"; // Label 컴포넌트가 필요할 수 있습니다. (설치되어 있지 않다면 npx shadcn-ui@latest add label)
+import { Label } from "@/components/ui/label";
 import { makeAiProductionDes, registerProduct } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import SuccessAnimation from "@/components/SuccessAnimation";
@@ -34,12 +34,12 @@ export default function ProductRegisterPage() {
 
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // 👇 --- 페이지 이동을 위해 등록된 상품 ID를 저장할 state 추가 --- 👇
+  // 페이지 이동을 위해 등록된 상품 ID를 저장할 state 추가
   const [registeredProductId, setRegisteredProductId] = useState(null);
 
   // 이미지 드래그 앤 드롭
   const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef(null); // 파일 인풋 참조
+  const fileInputRef = useRef(null);
 
   // 로딩 상태
   const [isAiLoading, setIsAiLoading] = useState(false);
@@ -66,7 +66,7 @@ export default function ProductRegisterPage() {
     }
   };
 
-  // 파일 입력 변경 핸들러 (기존 로직 재활용)
+  // 파일 입력 변경 핸들러
   const handleFileChange = (event) => {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -84,7 +84,7 @@ export default function ProductRegisterPage() {
     const selectedFiles = Array.from(files);
 
     const imageFiles = selectedFiles.filter((file) =>
-      file.type.startsWith("image/")
+      file.type.startsWith("image/"),
     );
 
     if (imageFiles.length === 0) return;
@@ -106,7 +106,7 @@ export default function ProductRegisterPage() {
   const handleRemoveImage = (indexToRemove) => {
     setImages((prevImages) => {
       const newImages = prevImages.filter(
-        (_, index) => index !== indexToRemove
+        (_, index) => index !== indexToRemove,
       );
       // 미리보기 URL 해제 (메모리 누수 방지)
       URL.revokeObjectURL(prevImages[indexToRemove].preview);
@@ -143,15 +143,12 @@ export default function ProductRegisterPage() {
     }
   };
 
-  // AI 추천 상세 설명 생성 함수 (더미)
+  // AI 추천 상세 설명 생성 함수
   const handleGenerateAISummary = async () => {
     console.log("ai 설명 생성");
-    // alert("AI 추천 상세 설명 생성 (실제 구현 필요)");
-    // 실제 백엔드 API 호출 로직이 여기에 들어갑니다.
-    // 필수 정보 입력되었는지 확인
     if (!name && !shortDescription && image.length === 0) {
       alert(
-        "AI가 설명을 생성하려면 상품명, 간단한 설명 중 하나를 입력해주세요."
+        "AI가 설명을 생성하려면 상품명, 간단한 설명 중 하나를 입력해주세요.",
       );
       return;
     }
@@ -174,7 +171,6 @@ export default function ProductRegisterPage() {
       // api 함수 호출
       const result = await makeAiProductionDes(productDataForAI, imageFiles);
 
-      // 👇 이 부분을 추가하여 result.data의 내용을 직접 확인합니다.
       console.log("AI 분석 API 응답 데이터:", result.data);
 
       // API 응답 결과에서 상세 설명을 가져와 state 업데이트
@@ -182,12 +178,8 @@ export default function ProductRegisterPage() {
         setDetailDescription(result.data.detailed_description);
         setAnalyzeId(result.data.analyze_id);
 
-        // 👇 result.data.main_image_url이 실제로 어떤 값인지 확인
         console.log("main_image_url from API:", result.data.main_image_url);
         setMainImageUrl(result.data.main_image_url || null);
-
-        // const analyzeId = result.data.analyze_id;
-        // console.log("AI 설명 ID: ", analyzeId);
       } else {
         // API 응답은 성공했지만, success가 false 이거나 데이터 형식이 다른 경우
         throw new Error(result.message || "AI가 설명을 생성하지 못했습니다.");
@@ -206,13 +198,6 @@ export default function ProductRegisterPage() {
       return;
     }
 
-    // if (images.length > 0 && !mainImageUrl) {
-    //   alert(
-    //     "이미지를 첨부했다면, 먼저 'AI 설명 생성'을 실행하여 이미지 URL을 생성해야 합니다."
-    //   );
-    //   return;
-    // }
-
     setIsSubmitting(true);
 
     try {
@@ -225,8 +210,6 @@ export default function ProductRegisterPage() {
         category,
         price: Number(price),
         analyze_id: analyzeId,
-        // image_urls: mainImageUrl ? [mainImageUrl] : [],
-        // main_index: 0,
       };
       console.log("등록할 상품 데이터:", productData);
 
@@ -234,13 +217,11 @@ export default function ProductRegisterPage() {
       const result = await registerProduct(productData);
 
       if (result && result.data && result.data.product_id) {
-        // 👇 1. setTimeout을 제거하고, 등록된 상품 ID를 state에 저장합니다.
+        // setTimeout을 제거하고, 등록된 상품 ID를 state에 저장
         setRegisteredProductId(result.data.product_id);
 
-        // 👇 2. 성공 애니메이션을 보여주기만 합니다.
+        // 성공 애니메이션
         setShowSuccess(true);
-        // 등록 성공 후, 생성된 상품의 상세 페이지로 이동
-        // router.push(`/product/${newProductId}`);
       } else {
         throw new Error(result.message || "상품 등록에 실패했습니다.");
       }
@@ -249,7 +230,7 @@ export default function ProductRegisterPage() {
     }
   };
 
-  // 👇 --- 애니메이션 재생이 끝나면 호출될 함수를 만듭니다 --- 👇
+  // 애니메이션 재생이 끝나면 호출될 함수
   const handleAnimationComplete = () => {
     setShowSuccess(false); // 애니메이션 숨기기
     if (registeredProductId) {
@@ -260,7 +241,7 @@ export default function ProductRegisterPage() {
 
   return (
     <div className="flex justify-center p-8 bg-gray-50">
-      {/* 1. 성공 상태일 때 SuccessAnimation 컴포넌트를 렌더링합니다. */}
+      {/* 성공 상태일 때 SuccessAnimation 컴포넌트를 렌더링. */}
       {showSuccess && (
         <SuccessAnimation
           message="상품이 성공적으로 등록되었습니다!"
@@ -409,7 +390,6 @@ export default function ProductRegisterPage() {
                     <SelectItem value="반려동물">반려동물</SelectItem>
                     <SelectItem value="공예">공예</SelectItem>
                     <SelectItem value="홈리빙">홈리빙</SelectItem>
-                    {/* ... 다른 카테고리 ... */}
                   </SelectContent>
                 </Select>
               </div>

@@ -136,7 +136,7 @@ export default function HomePage() {
                 추가한 키워드
               </h3>
               <div className="flex flex-wrap gap-2">
-                {/* 5. keywords 배열을 순회하며 Badge 동적 렌더링 */}
+                {/* keywords 배열을 순회하며 Badge 동적 렌더링 */}
                 {keywords.map((keyword, index) => (
                   <Badge
                     key={index} // React가 각 요소를 구분하기 위한 고유 key
@@ -157,8 +157,6 @@ export default function HomePage() {
           )}
         </div>
       </main>
-
-      {/* Footer (생략) */}
     </div>
   );
 }

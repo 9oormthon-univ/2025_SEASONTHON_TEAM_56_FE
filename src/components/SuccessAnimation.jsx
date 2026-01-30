@@ -2,8 +2,7 @@
 "use client";
 
 import Lottie from "lottie-react";
-// public 폴더에 저장한 success.json 파일을 직접 import 할 수 없습니다.
-// 대신 경로를 문자열로 사용합니다.
+
 const animationData = "/Success.json";
 
 export default function SuccessAnimation({ message, onComplete }) {
@@ -16,7 +15,7 @@ export default function SuccessAnimation({ message, onComplete }) {
           {" "}
           {/* 애니메이션 크기 조절 */}
           <Lottie
-            path={animationData} // public 폴더의 파일 경로
+            path={animationData}
             loop={false} // 한 번만 재생
             autoplay={true}
             onComplete={onComplete}

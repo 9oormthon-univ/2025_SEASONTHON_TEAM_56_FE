@@ -1,5 +1,5 @@
 // app/search/page.jsx
-"use client"; // 클라이언트 컴포넌트로 지정
+"use client";
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation"; // 쿼리 파라미터 가져오기
@@ -18,7 +18,7 @@ import LoadingAnimation from "@/components/LoadingAnimation";
 
 export default function SearchResultsPage() {
   const searchParams = useSearchParams();
-  const searchQuery = searchParams.get("query") || ""; // URL에서 'query' 파라미터 값을 가져옵니다.
+  const searchQuery = searchParams.get("query") || ""; // URL에서 'query' 파라미터 값을 가져옴
   const keywordsParam = searchParams.get("keywords") || "";
 
   const [recommendedProducts, setRecommendedProducts] = useState([]);
@@ -28,7 +28,7 @@ export default function SearchResultsPage() {
 
   useEffect(() => {
     // searchQuery를 이용해 백엔드 API를 호출하여
-    // 연관 키워드와 추천 상품 목록을 가져옵니다.
+    // 연관 키워드와 추천 상품 목록을 가져옴
     const fetchSearchResults = async () => {
       try {
         setIsLoading(true);
@@ -57,7 +57,7 @@ export default function SearchResultsPage() {
     if (searchQuery) {
       fetchSearchResults();
     } else {
-      // 검색어가 없으면 로딩을 멈추고 상품 목록을 비웁니다.
+      // 검색어가 없으면 로딩을 멈추고 상품 목록을 비움
       setIsLoading(false);
       setRecommendedProducts([]);
     }
@@ -69,15 +69,15 @@ export default function SearchResultsPage() {
       prevProducts.map((product) =>
         product.id === productId
           ? { ...product, isLiked: !product.isLiked }
-          : product
-      )
+          : product,
+      ),
     );
   };
 
   // 로딩 및 에러 상태에 따른 UI 처리
   if (isLoading) {
     return (
-      // 2. 로딩 컴포넌트가 중앙에 오도록 스타일링
+      // 로딩 컴포넌트가 중앙에 오도록 스타일링
       <div className="flex justify-center items-center h-[calc(100vh-64px)]">
         <LoadingAnimation />
       </div>
@@ -100,9 +100,6 @@ export default function SearchResultsPage() {
 
         {/* 연관 키워드 */}
         <div className="mb-8">
-          {/* <h2 className="text-sm font-semibold text-gray-700 mb-2">
-            AI 추출 키워드
-          </h2> */}
           <div className="flex flex-wrap gap-2">
             {relatedKeywords.map((keyword, index) => (
               <Badge
